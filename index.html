@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        textarea {
+            flex: 1;
+            margin: 10px;
+            height: 500px
+        }
+
+        .master {
+            display: flex;
+            flex-direction: column;
+            height: 100%
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-evenly;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="master">
+        <div class="row">
+            <textarea name="original" id="original"></textarea>
+            <textarea name="migrated" id="migrated"></textarea>
+        </div>
+        <div class="row">
+            <input type="button" value="CONVERT" onclick="converter()">
+        </div>
+    </div>
+
+    <script>
+
+        const converter = event => {
+            const original = document.getElementById("original").value
+            const migrated = document.getElementById("migrated")
+
+            var json = JSON.parse(original)
+
+            const payload = json.payload ? "payload" : "json.newPayload"
+
+            json[payload] = Object.assign({}, {
+                event: Object.entries(json[payload].event)
+                    .filter(key => ["resource", "path", "httpMethod", "queryStringParameters", "pathParameters", "stageVariables", "body"].includes(key[0]))
+                    .reduce((accum, [k, v]) => {
+                        accum[k] = v;
+                        return accum;
+                    }, {}),
+                response: json[payload].response
+            });
+
+            migrated.value = JSON.stringify(json, null, 4);
+            //console.log(json)
+        }
+    </script>
+</body>
+
+</html>
