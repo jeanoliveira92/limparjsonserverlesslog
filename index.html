@@ -25,24 +25,27 @@
         const converter = event => {
             // const original = document.getElementById("original").firstChild.value
             // const migrated = document.getElementById("migrated").firstChild
+            try {
+                const original = editor.getValue();
 
-            const original = editor.getValue();
+                var json = JSON.parse(original)
 
-            var json = JSON.parse(original)
+                const payload = json.payload ? "payload" : "json.newPayload"
 
-            const payload = json.payload ? "payload" : "json.newPayload"
+                const payloadAcceptedKeys = ["resource", "path", "httpMethod", "queryStringParameters", "pathParameters", "stageVariables", "body"];
 
-            const payloadAcceptedKeys = ["resource", "path", "httpMethod", "queryStringParameters", "pathParameters", "stageVariables", "body"];
+                json[payload] = Object.assign({}, {
+                    event: Object.entries(json[payload].event)
+                        .filter(key => payloadAcceptedKeys.includes(key[0]))
+                        .reduce((accum, [k, v]) => { accum[k] = v; return accum; }, {}),
+                    response: json[payload].response
+                });
 
-            json[payload] = Object.assign({}, {
-                event: Object.entries(json[payload].event)
-                    .filter(key => payloadAcceptedKeys.includes(key[0]))
-                    .reduce((accum, [k, v]) => { accum[k] = v; return accum; }, {}),
-                response: json[payload].response
-            });
-
-            //migrated.value = JSON.stringify(json, null, 4);
-            editor2.setValue(JSON.stringify(json, null, 4));
+                //migrated.value = JSON.stringify(json, null, 4);
+                editor2.setValue(JSON.stringify(json, null, 4));
+            } catch (err) {
+                editor2.setValue(err.message);
+            }
         }
     </script>
 
