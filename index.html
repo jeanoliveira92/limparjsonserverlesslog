@@ -26,7 +26,7 @@
             // const original = document.getElementById("original").firstChild.value
             // const migrated = document.getElementById("migrated").firstChild
             try {
-                const original = editor.getValue();
+                const original = editor.getValue().replace(/^(.)+{/,"{")
 
                 var json = JSON.parse(original)
 
