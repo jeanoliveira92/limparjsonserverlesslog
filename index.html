@@ -30,20 +30,25 @@
 
                 var json = JSON.parse(original)
 
-                const payload = json.payload ? "payload" : "json.newPayload"
+                const payload = json?.payload ? "payload" : "newPayload";
+
+                const request = json[payload]?.event ? "event" :  "request";
 
                 const payloadAcceptedKeys = ["resource", "path", "httpMethod", "queryStringParameters", "pathParameters", "stageVariables", "body"];
 
                 json[payload] = Object.assign({}, {
-                    event: Object.entries(json[payload].event)
+                    [request]: Object.entries(json[payload][request])
                         .filter(key => payloadAcceptedKeys.includes(key[0]))
                         .reduce((accum, [k, v]) => { accum[k] = v; return accum; }, {}),
                     response: json[payload].response
                 });
 
                 //migrated.value = JSON.stringify(json, null, 4);
+
+                console.log("JSON", json)
                 editor2.setValue(JSON.stringify(json, null, 4));
             } catch (err) {
+                console.log("JSON", json)
                 editor2.setValue(err.message);
             }
         }
